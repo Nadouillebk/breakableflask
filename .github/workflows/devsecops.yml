@@ -4,9 +4,11 @@ jobs:
   Dependances:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Dependances
         run: |
-          echo "ecrire ici le scrypt de contrôle des dépendances"
+          echo "Contrôle des dépendances"
+          docker run --rm -v $(pwd):/app aquasec/trivy fs /app/requirements.txt --exit-code 1 --severity HIGH,CRITICAL
   Dockerfile:
     runs-on: ubuntu-latest
     needs: Dependances

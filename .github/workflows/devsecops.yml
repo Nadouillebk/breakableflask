@@ -8,9 +8,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Dependances
         run: |
-          ls -la $GITHUB_WORKSPACE 
           echo "Contrôle des dépendances"
-          docker run --rm -v $GITHUB_WORKSPACE:/src -w /src aquasec/trivy fs . --exit-code 1 --severity HIGH,CRITICAL
+          docker run --rm -v $GITHUB_WORKSPACE:/src aquasec/trivy fs /src --exit-code 1 --severity HIGH,CRITICAL
 
   Dockerfile:
     runs-on: ubuntu-latest

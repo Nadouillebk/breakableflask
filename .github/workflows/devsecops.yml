@@ -10,7 +10,7 @@ jobs:
         run: |
           echo "Contrôle des dépendances"
           docker run --rm -v $GITHUB_WORKSPACE:/src aquasec/trivy fs /src --exit-code 1 --severity HIGH,CRITICAL
-
+  
   Dockerfile:
     runs-on: ubuntu-latest
     needs: Dependances
@@ -21,6 +21,22 @@ jobs:
           echo "Contrôle du Dockerfile avec Hadolint"
           docker run --rm -i hadolint/hadolint < Dockerfile
 
+  BuildAndScan:
+    runs-on: ubuntu-latest
+    needs: Dockerfile
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Construire image Docker
+        run: |
+          echo "Construction de l'image pour résoudre les dépendances"
+          docker build -t monapp:test .
+
+      - name: Scan de l'image construite
+        run: |
+          echo "Scan image finale avec Trivy"
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image monapp:test --exit-code 1 --severity HIGH,CRITICAL
+  
   Deploy:
     runs-on: ubuntu-latest
     needs: Dockerfile

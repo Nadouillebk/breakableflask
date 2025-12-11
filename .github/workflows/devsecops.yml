@@ -1,5 +1,6 @@
 name: Automatisation des tests DevSecOps
 on: push
+
 jobs:
   Dependances:
     runs-on: ubuntu-latest
@@ -9,13 +10,17 @@ jobs:
         run: |
           echo "Contrôle des dépendances"
           docker run --rm -v $GITHUB_WORKSPACE:/src aquasec/trivy fs /src --exit-code 1 --severity HIGH,CRITICAL
+
   Dockerfile:
     runs-on: ubuntu-latest
     needs: Dependances
     steps:
+      - uses: actions/checkout@v4 
       - name: Test Dockerfile
         run: |
-          echo "ecrire ici le scrypt de contrôle du Dockerfile"
+          echo "Contrôle du Dockerfile avec Hadolint"
+          docker run --rm -i hadolint/hadolint < Dockerfile
+
   Deploy:
     runs-on: ubuntu-latest
     needs: Dockerfile

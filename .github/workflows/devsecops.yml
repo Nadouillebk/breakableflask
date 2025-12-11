@@ -9,7 +9,7 @@ jobs:
       - name: Dependances
         run: |
           echo "Contrôle des dépendances"
-          docker run --rm -v $GITHUB_WORKSPACE:/src aquasec/trivy fs /src --exit-code 1 --severity HIGH,CRITICAL
+          docker run --rm -v $GITHUB_WORKSPACE:/src -w /src aquasec/trivy fs . --exit-code 1 --severity HIGH,CRITICAL
 
   Dockerfile:
     runs-on: ubuntu-latest

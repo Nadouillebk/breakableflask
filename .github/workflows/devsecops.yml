@@ -6,16 +6,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Dependances
+
+      - name: Generate Security Report
         run: |
-          echo "Contrôle des dépendances"
+          echo "# Rapport de Scan de Vulnérabilités" > report.md
+          echo "**Date:** $(date)" >> report.md
+          echo "**Branche:** ${GITHUB_REF#refs/heads/}" >> report.md
+          echo "**Commit:** $GITHUB_SHA" >> report.md
+          echo "" >> report.md
+          echo "## Détails Python (requirements.txt)" >> report.md
+          docker run --rm -v $GITHUB_WORKSPACE:/src aquasec/trivy fs /src --format table >> report.md
+
+      - name: Upload Report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Rapport-Vulnerabilites
+          path: report.md
+
+      - name: Security Gate
+        run: |
           docker run --rm -v $GITHUB_WORKSPACE:/src aquasec/trivy fs /src --exit-code 1 --severity HIGH,CRITICAL
-  
+
   Dockerfile:
     runs-on: ubuntu-latest
     needs: Dependances
     steps:
-      - uses: actions/checkout@v4 
+      - uses: actions/checkout@v4
       - name: Test Dockerfile
         run: |
           echo "Contrôle du Dockerfile avec Hadolint"
